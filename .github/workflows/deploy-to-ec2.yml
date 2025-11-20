@@ -1,8 +1,8 @@
-name: Deploy to EC2 (test)
+name: Deploy to EC2 (main)
 
 on:
   push:
-    branches: [ 'test' ]
+    branches: [ 'main' ]
 
 jobs:
   deploy:
