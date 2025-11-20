@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.js';
 import clientTracksRoutes from './routes/client/tracks.js';
 import adminTracksRoutes from './routes/admin/tracks.js';
 
+
 dotenv.config();
 
 const app: Express = express();
