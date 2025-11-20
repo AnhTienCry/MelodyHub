@@ -7,10 +7,7 @@ services:
       - mongo-data:/data/db
 
   backend:
-    build:
-      context: ./Backend
-      dockerfile: Dockerfile
-    image: melodyhub/backend:latest
+    image: ${DOCKERHUB_USERNAME}/melodyhub-backend:latest
     restart: unless-stopped
     depends_on:
       - mongo
@@ -22,10 +19,7 @@ services:
       - '5000:5000'
 
   frontend:
-    build:
-      context: ./Frontend
-      dockerfile: Dockerfile
-    image: melodyhub/frontend:latest
+    image: ${DOCKERHUB_USERNAME}/melodyhub-frontend:latest
     restart: unless-stopped
     depends_on:
       - backend
