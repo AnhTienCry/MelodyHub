@@ -5,7 +5,23 @@ on:
     branches: [ 'main' ]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test Backend (build)
+        working-directory: Backend
+        run: |
+          npm ci
+          npm run build
+      - name: Test Frontend (build)
+        working-directory: Frontend
+        run: |
+          npm ci
+          npm run build
+
   build-and-push:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
