@@ -1,71 +1,59 @@
-name: Deploy to EC2
+name: CI/CD MelodyHub
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: [ "main" ]
 
 jobs:
-  deploy:
-    name: Deploy to EC2 via docker-compose
+  build-and-push:
     runs-on: ubuntu-latest
-    environment: production
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Prepare SSH key
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "Writing SSH private key to file"
-          # Write the private key (keep newlines) from the repository secret
-          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
-          chmod 600 key.pem
-          ls -l key.pem || true
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Ensure scp/ssh available
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y openssh-client
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Copy docker-compose.yml to remote host
-        run: |
-          set -euo pipefail
-          scp -i key.pem -o StrictHostKeyChecking=no -P 22 ./docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/docker-compose.yml
+      # Build backend + push
+      - name: Build & Push Backend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Backend
+          file: ./Backend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/melodyhub-backend:latest
 
-      - name: Run docker compose on EC2 via SSH
+      # Build frontend + push
+      - name: Build & Push Frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Frontend
+          file: ./Frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/melodyhub-frontend:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
           script: |
-            set -euo pipefail
-            echo "Ensure Docker and docker compose are installed"
-            if ! command -v docker >/dev/null 2>&1; then
-              echo "Installing Docker"
-              sudo apt update
-              sudo apt install -y ca-certificates curl gnupg lsb-release
-              sudo mkdir -p /etc/apt/keyrings
-              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-              echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-              sudo apt update
-              sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-            fi
-
-            echo "Set DockerHub username in compose file if placeholder exists"
-            if grep -q '\${DOCKERHUB_USERNAME}' ~/docker-compose.yml; then
-              sed -i "s|\${DOCKERHUB_USERNAME}|${{ secrets.DOCKERHUB_USERNAME }}|g" ~/docker-compose.yml || true
-            fi
-
-            echo "Inject JWT_SECRET into compose file if placeholder exists"
-            if grep -q '\${JWT_SECRET}' ~/docker-compose.yml; then
-              sed -i "s|\${JWT_SECRET}|${{ secrets.JWT_SECRET }}|g" ~/docker-compose.yml || true
-            fi
-
-            echo "Pulling and starting services via docker compose (using sudo)"
-            sudo docker compose -f ~/docker-compose.yml pull --ignore-pull-failures || true
-            sudo docker compose -f ~/docker-compose.yml up -d
-
-            echo "Deployment finished"
+            cd ~/melodyhub
+            echo "Pulling latest images..."
+            sudo docker compose pull
+            echo "Restarting services..."
+            sudo docker compose up -d
+            echo "Deployment done!"
