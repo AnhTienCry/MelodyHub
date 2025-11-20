@@ -59,8 +59,13 @@ jobs:
               sed -i "s|\$DOCKERHUB_USER|${{ secrets.DOCKERHUB_USERNAME }}|g" ~/docker-compose.yml || true
             fi
 
-            echo "Pulling and starting services via docker compose"
-            docker compose -f ~/docker-compose.yml pull --ignore-pull-failures || true
-            docker compose -f ~/docker-compose.yml up -d
+            echo "Inject JWT_SECRET into compose file if placeholder exists"
+            if grep -q '\$JWT_SECRET' ~/docker-compose.yml; then
+              sed -i "s|\$JWT_SECRET|${{ secrets.JWT_SECRET }}|g" ~/docker-compose.yml || true
+            fi
+
+            echo "Pulling and starting services via docker compose (using sudo)"
+            sudo docker compose -f ~/docker-compose.yml pull --ignore-pull-failures || true
+            sudo docker compose -f ~/docker-compose.yml up -d
 
             echo "Deployment finished"
