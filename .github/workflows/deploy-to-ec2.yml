@@ -1,0 +1,54 @@
+name: Deploy to EC2 (test)
+
+on:
+  push:
+    branches: [ 'test' ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Upload `docker-compose.yml` to EC2 via scp
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          set -e
+          echo "Writing SSH key"
+          printf '%s' "$EC2_SSH_KEY" > key.pem
+          chmod 600 key.pem
+
+          echo "Copying docker-compose.yml to remote host"
+          scp -i key.pem -o StrictHostKeyChecking=no -P 22 ./docker-compose.yml $EC2_USER@$EC2_HOST:~/docker-compose.yml
+
+      - name: Run docker compose on EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+            echo "Ensure Docker and docker compose are installed"
+            if ! command -v docker >/dev/null 2>&1; then
+              echo "Installing Docker"
+              sudo apt update
+              sudo apt install -y ca-certificates curl gnupg lsb-release
+              sudo mkdir -p /etc/apt/keyrings
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+              echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+              sudo apt update
+              sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+            fi
+
+            echo "Set DockerHub username in compose file if missing"
+            sed -i "s|\$DOCKERHUB_USER|${{ secrets.DOCKERHUB_USERNAME }}|g" ~/docker-compose.yml || true
+
+            echo "Pulling and starting services via docker compose"
+            docker compose -f ~/docker-compose.yml pull || true
+            docker compose -f ~/docker-compose.yml up -d
+
+            echo "Deployment complete"
