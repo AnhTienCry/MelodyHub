@@ -5,7 +5,7 @@ import connectDB from './config/database.js';
 import { logger, errorHandler, notFound } from './middleware/index.js';
 import authRoutes from './routes/auth.js';
 import clientTracksRoutes from './routes/client/tracks.js';
-import adminTracksRoutes from './routes/admin/tracks.js';
+import adminTracksRoutes from './routes/Admin/tracks.js';
 
 dotenv.config();
 
