@@ -45,7 +45,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "src/controllers/Admin",
-    "src/routes/Admin"
+    "src/controllers/admin",
+    "src/routes/admin"
   ]
 }
