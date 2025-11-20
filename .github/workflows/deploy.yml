@@ -1,4 +1,4 @@
-name: Deploy to EC2 (main)
+name: Deploy to EC2
 
 on:
   push:
@@ -6,22 +6,32 @@ on:
 
 jobs:
   deploy:
+    name: Deploy to EC2 via docker-compose
     runs-on: ubuntu-latest
+    environment: production
     steps:
-      - uses: actions/checkout@v4
-      - name: Upload `docker-compose.yml` to EC2 via scp
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-        run: |
-          set -e
-          echo "Writing SSH key"
-          printf '%s' "$EC2_SSH_KEY" > key.pem
-          chmod 600 key.pem
+      - name: Checkout
+        uses: actions/checkout@v4
 
-          echo "Copying docker-compose.yml to remote host"
-          scp -i key.pem -o StrictHostKeyChecking=no -P 22 ./docker-compose.yml $EC2_USER@$EC2_HOST:~/docker-compose.yml
+      - name: Prepare SSH key
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Writing SSH private key to file"
+          # Write the private key (keep newlines) from the repository secret
+          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          ls -l key.pem || true
+
+      - name: Ensure scp/ssh available
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y openssh-client
+
+      - name: Copy docker-compose.yml to remote host
+        run: |
+          set -euo pipefail
+          scp -i key.pem -o StrictHostKeyChecking=no -P 22 ./docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/docker-compose.yml
 
       - name: Run docker compose on EC2 via SSH
         uses: appleboy/ssh-action@v0.1.7
@@ -31,7 +41,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-            set -e
+            set -euo pipefail
             echo "Ensure Docker and docker compose are installed"
             if ! command -v docker >/dev/null 2>&1; then
               echo "Installing Docker"
@@ -45,10 +55,12 @@ jobs:
             fi
 
             echo "Set DockerHub username in compose file if missing"
-            sed -i "s|\$DOCKERHUB_USER|${{ secrets.DOCKERHUB_USERNAME }}|g" ~/docker-compose.yml || true
+            if grep -q '\$DOCKERHUB_USER' ~/docker-compose.yml; then
+              sed -i "s|\$DOCKERHUB_USER|${{ secrets.DOCKERHUB_USERNAME }}|g" ~/docker-compose.yml || true
+            fi
 
             echo "Pulling and starting services via docker compose"
-            docker compose -f ~/docker-compose.yml pull || true
+            docker compose -f ~/docker-compose.yml pull --ignore-pull-failures || true
             docker compose -f ~/docker-compose.yml up -d
 
-            echo "Deployment complete"
+            echo "Deployment finished"
