@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "npx tsx watch src/index.ts",
     "seed": "npx tsx src/scripts/seedAdmin.ts",
+    "import-nct": "npx tsx src/scripts/importNCT.ts",
+    "fetch-nct": "npx tsx src/scripts/fetchAndSaveNct.ts",
+    "import-from-file": "npx tsx src/scripts/importFromFile.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,16 +18,20 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
     "@types/cors": "^2.8.19",
+    "@types/crypto-js": "^4.2.2",
     "@types/express": "^5.0.5",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.1",
-    "@types/bcryptjs": "^2.4.2",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@types/multer": "^2.0.0",
+    "axios": "^1.13.2",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
@@ -32,6 +39,8 @@
     "express-validator": "^7.3.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.20.0",
-    "bcryptjs": "^2.4.3"
+    "multer": "^2.0.2",
+    "nctapi": "^1.0.0",
+    "qs": "^6.14.0"
   }
 }

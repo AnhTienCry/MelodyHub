@@ -30,9 +30,9 @@ function AdminSidebar({ onLogout }: AdminSidebarProps) {
           </Link>
           <Link
             to="/admin/playlists"
-            className="block px-4 py-3 rounded-lg hover:bg-dark-lighter transition"
+            className="block px-4 py-3 rounded-lg hover:bg-dark-lighter transition opacity-50 cursor-not-allowed"
           >
-            📚 Playlists
+            📚 Playlists (Coming Soon)
           </Link>
         </nav>
       </div>

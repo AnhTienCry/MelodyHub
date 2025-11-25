@@ -1,0 +1,35 @@
+import type { Request, Response } from 'express';
+export declare const search: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const artist: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const track: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const album: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const playlist: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const playlistTracks: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const newReleases: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const categories: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const categoryPlaylists: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const artistTopTracks: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const artistAlbums: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const audioFeatures: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const recommendations: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const listSongs: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const getSong: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+declare const _default: {
+    search: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    artist: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    track: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    album: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    playlist: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    playlistTracks: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    newReleases: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    categories: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    categoryPlaylists: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    artistTopTracks: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    artistAlbums: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    audioFeatures: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    recommendations: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    listSongs: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+    getSong: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+};
+export default _default;
+//# sourceMappingURL=spotifyController.d.ts.map

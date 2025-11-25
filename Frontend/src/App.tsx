@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout, ClientLayout, ProtectedRoute, NavDock } from './components';
+import { SongsProvider } from './context/SongsContext'
+
 import LoginPage from './pages/client/login/LoginPage';
 import RegisterPage from './pages/client/register/RegisterPage';
 import PlayerPage from './pages/client/player/PlayerPage';
@@ -16,6 +18,7 @@ import AdminSongs from './pages/admin/songs/SongsPage';
 function App() {
   return (
     <Router>
+      <SongsProvider>
       <div className="dark antialiased bg-black text-white min-h-screen">
         <Routes>
         {/* Public Auth routes */}
@@ -37,6 +40,9 @@ function App() {
           <Route index element={<ClientHome />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="player" element={<PlayerPage />} />
+          <Route path="library" element={<div className="p-8 text-white">Library - Coming Soon</div>} />
+          <Route path="favorites" element={<div className="p-8 text-white">Favorites - Coming Soon</div>} />
+          <Route path="settings" element={<div className="p-8 text-white">Settings - Coming Soon</div>} />
         </Route>
         
         {/* Admin Routes - Protected with admin role */}
@@ -59,6 +65,7 @@ function App() {
       </Routes>
       <NavDock />
       </div>
+      </SongsProvider>
     </Router>
   );
 }

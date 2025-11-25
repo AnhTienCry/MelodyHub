@@ -9,7 +9,7 @@ export function SiteHeader() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-black/20 backdrop-blur-md border-b border-white/5">
-      <Link to="/" className="flex items-center gap-2 group">
+      <Link to="/client" className="flex items-center gap-2 group">
         <div className="w-8 h-8 rounded-full bg-linear-to-tr from-purple-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
           <div className="w-3 h-3 bg-white rounded-full" />
         </div>
@@ -17,15 +17,15 @@ export function SiteHeader() {
       </Link>
 
       <div className="flex items-center gap-6">
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-white/60">
-          <Link to="#" className="hover:text-white transition-colors">
+      <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-white/60">
+          <Link to="/client" className="hover:text-white transition-colors">
             Discover
           </Link>
-          <Link to="#" className="hover:text-white transition-colors">
-            Library
+          <Link to="/client/search" className="hover:text-white transition-colors">
+            Search
           </Link>
-          <Link to="#" className="hover:text-white transition-colors">
-            Radio
+          <Link to="/client/player" className="hover:text-white transition-colors">
+            Player
           </Link>
         </nav>
 

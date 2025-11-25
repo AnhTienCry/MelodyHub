@@ -6,7 +6,7 @@ function ClientLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-20 pb-24">
         <Outlet />
       </main>
       <SiteFooter />

@@ -16,14 +16,14 @@ export function NavDock() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-      <div className="flex items-center gap-2 px-4 py-3 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+      <div className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-full bg-black/30 backdrop-blur-xl border border-white/8 shadow-lg">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
           
           return (
-            <Link
+              <Link
               key={item.path}
               to={item.path}
               className={`relative group p-3 rounded-full transition-all duration-300 ${
@@ -32,7 +32,7 @@ export function NavDock() {
                   : 'text-white/60 hover:text-white hover:bg-white/10'
               }`}
             >
-              <Icon size={20} />
+              <Icon size={18} />
               
               {/* Tooltip */}
               <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/80 backdrop-blur-sm text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
